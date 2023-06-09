@@ -1,5 +1,9 @@
 #!/bin/sh
 
+pwd
+ls
+echo '--------debug--------'
+git status --short
 files=$(git status --short | awk '{print $2}')
 echo "files: $files"
 
