@@ -1,9 +1,6 @@
 #!/bin/sh
 
-pwd
-ls
-echo '--------debug--------'
-git status --short
+git checkout main
 files=$(git status --short | awk '{print $2}')
 echo "files: $files"
 
