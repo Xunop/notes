@@ -1,6 +1,7 @@
 #!/bin/sh
 
 git checkout main
+git status --short
 files=$(git status --short | awk '{print $2}')
 echo "files: $files"
 
