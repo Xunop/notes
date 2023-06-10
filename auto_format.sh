@@ -1,7 +1,8 @@
 #!/bin/sh
 
 git checkout main
-files=$(git diff HEAD^ HEAD --name-only | awk '{print $2}')
+git diff HEAD^ HEAD --name-only
+files=$(git diff HEAD^ HEAD --name-only)
 echo "files: $files"
 
 for file in $files
