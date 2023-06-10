@@ -31,4 +31,4 @@ this is test.
 
 final test.
 
-ok, this is realy final test.
+ok, this is realy final test. :)
