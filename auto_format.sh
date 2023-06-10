@@ -1,8 +1,7 @@
 #!/bin/sh
 
 git checkout main
-git status --short
-files=$(git status --short | awk '{print $2}')
+files=$(git diff HEAD^ HEAD --name-only | awk '{print $2}')
 echo "files: $files"
 
 for file in $files
