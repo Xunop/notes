@@ -46,3 +46,5 @@
 `git submodule deinit <submodule>` 将卸载子模块。
 
 之后可以执行 `git rm <submodule-path>` 移除这个文件夹。
+
+更多内容可以查看 git book 中对 git submodule 的讲解：[git-submodule](https://git-scm.com/book/zh/v2/Git-工具-子模块)
