@@ -7,5 +7,5 @@ echo "files: $files"
 
 for file in $files
 do
-  ../my_scripts/format.sh -f "$file"
+  /bin/bash ../my_scripts/format.sh -f "$file"
 done
