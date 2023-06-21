@@ -10,7 +10,7 @@
 
 ## clone 含有子模块的项目
 
-`git clone <url>` 将 clone 一个项目下来，里面虽然有子模块目录，但是并没有任何文件，
+`git clone <url>` 将 `clone` 一个项目下来，里面虽然有子模块目录，但是并没有任何文件，
 你需要运行两个命令：`git submodule init` 用来初始化本地配置文件，
 `git submodule update` 从该项目中 fetch 所有数据并 check out 与父项目中列出的相应提交。
 这个命令会 clone 子模块仓库，并将其 checkout 到指定的提交。
