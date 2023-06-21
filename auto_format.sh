@@ -1,7 +1,6 @@
 #!/bin/bash
 
 git checkout main
-git diff HEAD^ HEAD --name-only
 files=$(git diff HEAD^ HEAD --name-only)
 echo "files: $files"
 
@@ -18,12 +17,18 @@ done < .fignore
 echo "ignore_list: ${ignore_list[@]}"
 for file in $files
 do
-  # Ignore files in the ignore list
-  if [[ " ${ignore_list[@]} " =~ "$file" ]]; then
-    echo "Ignoring file: $file"
-    continue
-  fi
-  
-  echo "Formatting file: $file"
-  #/bin/bash ../my_scripts/format.sh -f "$file"
+  # Ignore files that match any pattern in the ignore list
+  for pattern in "${ignore_list[@]}"; do
+    if [[ $file == $pattern ]]; then
+      echo "Ignoring file: $file"
+      continue 2
+    fi
+    name=$(basename $file)
+    if [[ $name == $pattern ]]; then
+      echo "Ignoring file: $file"
+      continue 2
+    fi
+    echo "Formatting file: $file"
+    /bin/bash ../my_scripts/format.sh -f "$file"
+  done
 done
