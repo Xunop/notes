@@ -19,6 +19,10 @@
 除了上述的方式之外，还可以给 `git clone` 命令用 `--recurse-submodules` 参数。
 它会自动初始化并更新仓库中的每一个子模块。
 
+## 查看子模块
+
+`git submodule status --recursive` 会列出所有子模块。
+
 ## 子模块内容的更新
 
 子模块就是一个完整的 git 仓库，使用正常的 git 代码管理规范操作即可。
@@ -26,6 +30,8 @@
 ### 子模块的更新
 
 `git submodule update --remote` 将会从 remote 更新**所有**子模块，如果你不需要修改这个子模块，那么这样是没有问题的。
+
+在父项目中使用 `git pull` 不会合并子模块中的修改。
 
 更新之后不要忘了在父项目中提交本次更新。
 
@@ -47,4 +53,4 @@
 
 之后可以执行 `git rm <submodule-path>` 移除这个文件夹。
 
-更多内容可以查看 git book 中对 git submodule 的讲解：[git-submodule](https://git-scm.com/book/zh/v2/Git-工具-子模块)
+更多内容可以查看 Git book 中对 git submodule 的讲解：[git-submodule](https://git-scm.com/book/zh/v2/Git-工具-子模块)
