@@ -11,6 +11,4 @@
 }
 [[gnu::noinline]] void bar() { qux(); }
 [[gnu::noinline]] void foo() { bar(); }
-int main() { 
-  foo();
-}
+int main() { foo(); }
