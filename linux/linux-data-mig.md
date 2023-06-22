@@ -2,7 +2,7 @@
 
 前段时间把社团服务器上的数据进行了迁移，这里记录一下大概的迁移方式。
 
-ssh 配合 tar 直接将文件传到我本机电脑：
+管道的妙用。ssh 配合 tar 直接将文件传到我本机电脑：
 
 ```sh
 ssh -i $HOME/.ssh/tmp_rsa  root@host tar -cp --exclude-from=/root/exclude.txt /  | pv -ptr | tar x -C /home/xun/Workspace/sastback
