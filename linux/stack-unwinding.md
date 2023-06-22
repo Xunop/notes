@@ -1,6 +1,6 @@
 # stack unwinding
 
-将 linux unwinding 的一些概念进行梳理。
+将 linux 中的 stack unwinding 的一些概念进行梳理。
 
 ## Stack unwinding
 
