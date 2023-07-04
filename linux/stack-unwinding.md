@@ -39,7 +39,7 @@ int main() { foo(); }
 通过这个代码的汇编我们可以清晰的看见 stack unwinding 的处理流程。
 代码太长，放到 github 仓库中，在一些地方写了注释：[cs.s](https://github.com/Xunop/notes/blob/main/linux/stack_unwinding/cs.s)
 
-这是一种软件的抽象：过程(procedures)，我在这篇博客中有记录：[过程](https://blog.fooo.in/2023/06/22/CS/cs-procedure)
+这是一种软件的抽象：过程(procedures)，我在这篇博客中有记录：[过程](https://blog.fooo.in/2023/06/23/CS/cs-procedure)
 
 ### DWARF
 
