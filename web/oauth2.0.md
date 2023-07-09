@@ -154,3 +154,7 @@ D. 客户端收到授权码，附上去获取授权码的重定向 URI，向认�
 E. 认证服务器核对了授权码和重定向 URI，确认无误后，向客户端发送访问令牌（access token） 或者更新令牌（refresh token）。
 
 其他三种模式，请参考阮一峰老师的文章：[理解OAuth2.0](https://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html)
+
+## RefreshToken
+
+关于RefreshToken这边依旧有很多讨论，在OAuth2这边是使用了RefreshToken这个技术，但是如果是平时的登录操作是否也需要使用RefreshToken这是个问题。查阅了一些信息：https://stackoverflow.com/questions/38986005/what-is-the-purpose-of-a-refresh-token, https://stackoverflow.com/questions/3487991/why-does-oauth-v2-have-both-access-and-refresh-tokens/12885823#12885823
