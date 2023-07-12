@@ -2,7 +2,7 @@
 
 git checkout main
 files=$(git diff HEAD^ HEAD --name-only)
-echo "files: $files"
+echo "[INFO] new files: $(echo $files | awk '{print}')"
 
 # Read the .fignore file
 while read line; do
@@ -15,6 +15,7 @@ while read line; do
 done < .fignore
 
 echo "ignore_list: ${ignore_list[@]}"
+#set -x
 for file in $files
 do
   # Ignore files that match any pattern in the ignore list
@@ -28,7 +29,7 @@ do
       echo "Ignoring file: $file"
       continue 2
     fi
-    echo "Formatting file: $file"
-    /bin/bash ../my_scripts/format.sh -f "$file"
   done
+  echo "Formatting file: $file"
+  /bin/bash ../my_scripts/format.sh -f "$file"
 done
