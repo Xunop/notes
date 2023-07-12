@@ -348,3 +348,24 @@ static arm_decode_class aarch64_insn_dp_imm_decode_table[NR_DP_IMM_SUBCLASS] = {
 
   https://developer.arm.com/documentation/ddi0596/2020-12/Base-Instructions/BFXIL--Bitfield-extract-and-insert-at-low-end--an-alias-of-BFM-
 
+`tools/objtool/arch/arm64/include/bit_operations.h`中有这样一段宏定义，定义一些常见的位操作：
+
+```c
+// 生成N位全为1的值
+#define ONES(N)			(((__uint128_t)1 << (N)) - 1)
+// 零扩展：零扩展指的是将目标的高位数设置为零，而不是将高位数设置成原数字的最高有效位。
+// 零扩展通常用于将无符号数字移动至较大的字段中，同时保留其数值；
+// 而符号扩展通常用于有符号的数字。 
+#define ZERO_EXTEND(X, N)	((X) & ONES(N))
+#define EXTRACT_BIT(X, N)	(((X) >> (N)) & ONES(1))
+// 符号扩展
+#define SIGN_EXTEND(X, N)	sign_extend((X), (N))
+
+// '~' 为取反
+// 0UL 表示把数字0转换为无符号长整型数
+// ~0UL 表示生成一个具有所有位都为1的掩码
+static inline unsigned long sign_extend(unsigned long x, int nbits)
+{
+	return ((~0UL + (EXTRACT_BIT(x, nbits - 1) ^ 1)) << nbits) | x;
+}
+```
