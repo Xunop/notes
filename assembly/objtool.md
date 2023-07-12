@@ -1,3 +1,7 @@
+# Objtool
+
+## 基础理论
+
 我在测试时所用的几个命令：
 
 ```sh
@@ -233,3 +237,114 @@ Disassembly of section .text:
 ```
 
 基指针 `bp:prevsp-24`：初始化 8，sub 8, push rbp 三个加起来得出 24。
+
+## kernel 代码实现
+
+orc unwind 流程：
+
+```
++----------+     +------------+     +------------+     +------------+     +------------+
+|          |     |            |     |            |     |            |     |            |
+| ELF file +---->+   指令流   +---->+ 堆栈信息   +---->+ ORC段      +---->+ 运行时堆栈 |
++----------+     +------------+     +------------+     +------------+     +------------+
+            指令解析          指令检查            ORC生成            ORC推栈
+            decode            check               gfenerate          unwinder
+```
+
+> ELF 文件就是编译 C 程序时生成的可执行文件。ELF 文件以 ELF 头（ELF Header）开始，其中包含了关于文件本身的信息，如文件类型、体系结构、入口点地址等。紧接着是节头表（Section Header Table），它列出了 ELF 文件中的所有节（sections）。每个节都有自己的名称、大小和位置等属性。常见的节包括代码段（.text）、数据段（.data）和未初始化的数据段（.bss）等。然后是程序头表（Program Header Table），它描述了 ELF 文件在内存中的布局。每个程序头（Program Header）对应一个段（segment），它指示操作系统如何加载 ELF 文件的不同部分到内存中。例如，加载代码段、数据段和未初始化的数据段等。最后，ELF 文件的剩余部分是实际的代码和数据，它们根据 ELF 文件的布局被加载到内存中。
+
+armv8 二进制位表示（C4 章节）：https://developer.arm.com/documentation/ddi0487/latest/
+
+在 `tools/objtool/check.h` 中有这样一个 `instruction` 结构体：
+
+```c
+struct instruction {
+	struct list_head list;
+	struct hlist_node hash;
+	struct section *sec;
+	unsigned long offset;
+	unsigned int len;
+	enum insn_type type;
+	unsigned long immediate;
+	bool alt_group, dead_end, ignore, hint, save, restore, ignore_alts;
+	bool retpoline_safe;
+	u8 visited;
+	struct symbol *call_dest;
+	struct instruction *jump_dest;
+	struct instruction *first_jump_src;
+	struct rela *jump_table;
+	struct list_head alts;
+	struct symbol *func;
+	struct stack_op stack_op;
+	struct insn_state state;
+	struct orc_entry orc;
+};
+```
+
+```
+ 31 30 29+28   |   26|25    |23|22         |                                                                            0|
+         |     |     |      |  |           |                                                                             |
++--------------+------------+--------------+-----------------------------------------------------------------------------+
+|        |           |         |                                                                                         |
+|        |           |  op0    |                                                                                         |
+|        |   100     |         |                                                                                         |
+|        |           |         |                                                                                         |
++--------+-----------+---------+-----------------------------------------------------------------------------------------+
+```
+
+当 28-26 位为 100 时，armv8 的指令格式如上。其中，op0 的数字的不同有不同的作用(C4.1.86):
+
+| Decode fields op0 | Decode group or instruction page   |
+| ----------------- | ---------------------------------- |
+| 00x               | PC-rel. addressing                 |
+| 010               | Add/subtract(immediate)            |
+| 011               | Add/subtract(immediate, with tags) |
+| 100               | Logical(immediate)                 |
+| 101               | Move wide(immediate)               |
+| 110               | Bitfield                           |
+| 111               | Extract                            |
+
+详细情况查阅文档(c4.1.86)
+
+```c
+#define INSN_DP_IMM_SUBCLASS(opcode)			\
+	(((opcode) >> 23) & (NR_DP_IMM_SUBCLASS - 1))
+```
+
+`INSN_DP_IMM_SUBCLASS` 的操作就是获取 op0 的值。
+
+`tools/objtool/arch/arm64/decode.c` 中有这样一个数组：
+
+```c
+#define NR_DP_IMM_SUBCLASS	8
+#define INSN_MOVE_WIDE	0b101
+#define INSN_BITFIELD	0b110
+#define INSN_EXTRACT	0b111
+#define INSN_PCREL	0b001	//0b00x
+
+static arm_decode_class aarch64_insn_dp_imm_decode_table[NR_DP_IMM_SUBCLASS] = {
+	[0 ... INSN_PCREL]	= arm_decode_pcrel,
+	[INSN_MOVE_WIDE]	= arm_decode_move_wide,
+	[INSN_BITFIELD]		= arm_decode_bitfield,
+	[INSN_EXTRACT]		= arm_decode_extract,
+};
+```
+
+这个数组用于将不同编码类别的 ARM64 指令与对应的解码函数关联。op0 的值不同有不同的解析函数。
+
+- `arm_decode_pcrel`:PC-relative addressing:ADRP x0, {pc}.
+
+  https://developer.arm.com/documentation/dui0742/g/Migrating-ARM-syntax-assembly-code-to-GNU-syntax/PC-relative-addressing?lang=en
+
+- `arm_decode_move_wide`:move wide instruction:MOVZ,MOVK,MOVS....
+
+  https://developer.arm.com/documentation/dui0489/i/arm-and-thumb-instructions/mov
+
+- `arm_decode_bitfield`:bitfield operation:
+
+  https://developer.arm.com/documentation/den0024/a/The-A64-instruction-set/Data-processing-instructions/Bitfield-and-byte-manipulation-instructions?lang=en
+
+- `arm_decode_extract`:bit extract
+
+  https://developer.arm.com/documentation/ddi0596/2020-12/Base-Instructions/BFXIL--Bitfield-extract-and-insert-at-low-end--an-alias-of-BFM-
+
