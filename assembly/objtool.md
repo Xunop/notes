@@ -357,6 +357,7 @@ static arm_decode_class aarch64_insn_dp_imm_decode_table[NR_DP_IMM_SUBCLASS] = {
 // 零扩展通常用于将无符号数字移动至较大的字段中，同时保留其数值；
 // 而符号扩展通常用于有符号的数字。 
 #define ZERO_EXTEND(X, N)	((X) & ONES(N))
+// 提取X中的第N位位数
 #define EXTRACT_BIT(X, N)	(((X) >> (N)) & ONES(1))
 // 符号扩展
 #define SIGN_EXTEND(X, N)	sign_extend((X), (N))
@@ -364,8 +365,36 @@ static arm_decode_class aarch64_insn_dp_imm_decode_table[NR_DP_IMM_SUBCLASS] = {
 // '~' 为取反
 // 0UL 表示把数字0转换为无符号长整型数
 // ~0UL 表示生成一个具有所有位都为1的掩码
+// nbits 表示x的最高位位置
 static inline unsigned long sign_extend(unsigned long x, int nbits)
 {
 	return ((~0UL + (EXTRACT_BIT(x, nbits - 1) ^ 1)) << nbits) | x;
+}
+```
+
+处理PC-rel. addressing的情况：
+
+```c
+int arm_decode_pcrel(u32 instr, enum insn_type *type,
+		     unsigned long *immediate, struct list_head *ops_list)
+{
+	unsigned char page = 0;
+	u32 immhi = 0, immlo = 0;
+
+    // 首位为 0 为 ADR 操作
+    // 1 则为 ADRP
+	page = EXTRACT_BIT(instr, 31);
+	immhi = (instr >> 5) & ONES(19);
+	immlo = (instr >> 29) & ONES(2);
+
+    // 符号扩展不理解为什么需要 << 2 | immlo
+	*immediate = SIGN_EXTEND((immhi << 2) | immlo, 21);
+
+	if (page)
+		*immediate = SIGN_EXTEND(*immediate << 12, 33);
+
+	*type = INSN_OTHER;
+
+	return 0;
 }
 ```
