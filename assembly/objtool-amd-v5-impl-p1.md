@@ -1,21 +1,6 @@
-# objtool amd kernel 代码实现
-
-orc unwind 流程：
-
-```
-+----------+     +------------+     +------------+     +------------+     +------------+
-|          |     |            |     |            |     |            |     |            |
-| ELF file +---->+   指令流   +---->+ 堆栈信息   +---->+ ORC段      +---->+ 运行时堆栈 |
-+----------+     +------------+     +------------+     +------------+     +------------+
-            指令解析          指令检查            ORC生成            ORC推栈
-            decode            check               gfenerate          unwinder
-```
-
-> ELF 文件就是编译 C 程序时生成的可执行文件。ELF 文件以 ELF 头（ELF Header）开始，其中包含了关于文件本身的信息，如文件类型、体系结构、入口点地址等。紧接着是节头表（Section Header Table），它列出了 ELF 文件中的所有节（sections）。每个节都有自己的名称、大小和位置等属性。常见的节包括代码段（.text）、数据段（.data）和未初始化的数据段（.bss）等。然后是程序头表（Program Header Table），它描述了 ELF 文件在内存中的布局。每个程序头（Program Header）对应一个段（segment），它指示操作系统如何加载 ELF 文件的不同部分到内存中。例如，加载代码段、数据段和未初始化的数据段等。最后，ELF 文件的剩余部分是实际的代码和数据，它们根据 ELF 文件的布局被加载到内存中。
-
 armv8 二进制位表示（C4 章节）：https://developer.arm.com/documentation/ddi0487/latest/
 
-在 `tools/objtool/check.h` 中有这样一个 `instruction` 结构体：
+在 `tools/objtool/check.h` 中有这样一个 `instruction` 结构体表示一个指令：
 
 ```c
 struct instruction {
@@ -42,6 +27,8 @@ struct instruction {
 ```
 
 ## Data Processing -- Immediate
+
+处理立即数。
 
 对应代码：
 
@@ -97,14 +84,20 @@ int arm_decode_dp_imm(u32 instr, enum insn_type *type,
 `tools/objtool/arch/arm64/decode.c` 中有这样一个数组：
 
 ```c
-#define NR_DP_IMM_SUBCLASS	8
+#define INSN_PCREL	0b001	//0b00x
+#define INSN_ADD_SUB	0b010
+#define INSN_ADD_TAG	0b011
+#define INSN_LOGICAL	0b100
 #define INSN_MOVE_WIDE	0b101
 #define INSN_BITFIELD	0b110
 #define INSN_EXTRACT	0b111
-#define INSN_PCREL	0b001	//0b00x
 
+// 这个数组与上方表格相对
 static arm_decode_class aarch64_insn_dp_imm_decode_table[NR_DP_IMM_SUBCLASS] = {
 	[0 ... INSN_PCREL]	= arm_decode_pcrel,
+	[INSN_ADD_SUB]		= arm_decode_add_sub,
+	[INSN_ADD_TAG]		= arm_decode_add_sub_tags,
+	[INSN_LOGICAL]		= arm_decode_logical,
 	[INSN_MOVE_WIDE]	= arm_decode_move_wide,
 	[INSN_BITFIELD]		= arm_decode_bitfield,
 	[INSN_EXTRACT]		= arm_decode_extract,
@@ -258,7 +251,7 @@ int arm_decode_move_wide(u32 instr, enum insn_type *type,
 }
 ```
 
-## 处理 Bitfield 的情况
+### 处理 Bitfield 的情况
 
 布局：
 
@@ -314,7 +307,7 @@ int arm_decode_bitfield(u32 instr, enum insn_type *type,
 - #immr 是右移位数的立即数。它定义了从源操作数中提取位域时的右移数。
 - #imms 是位域长度的立即数。它定义了要提取的位域的长度。
 
-## 处理 extract 的情况
+### 处理 extract 的情况
 
 布局
 
@@ -354,10 +347,12 @@ int arm_decode_extract(u32 instr, enum insn_type *type,
 	o0 = EXTRACT_BIT(instr, 21);
 	imms = (instr >> 10) & ONES(6);
 
+	// decode_field 的作用刚好可以排除Unallocated的情况
 	decode_field = (sf << 4) | (op21 << 2) | (N << 1) | o0;
 	*type = INSN_OTHER;
 	*immediate = imms;
 
+    // 10010 是EXTR-64-bit，0则是EXTR-32-bit
 	if ((decode_field == 0 && !EXTRACT_BIT(imms, 5)) ||
 	    decode_field == 0b10010)
 		return 0;
@@ -365,3 +360,65 @@ int arm_decode_extract(u32 instr, enum insn_type *type,
 	return arm_decode_unknown(instr, type, immediate, ops_list);
 }
 ```
+
+类似的，以下操作都可以根据 [armv8 手册](https://developer.arm.com/documentation/ddi0487/latest/) 查找到，这部分内容是处理立即数：C4.1.86
+
+### Add/subtract (immediate)
+
+在函数 `arm_decode_add_subarm_decode_add_sub` 实现。
+
+关于它的布局查看手册。其中 rn 表示源寄存器，rd 表示目标寄存器。
+
+```c
+#define CFI_R29			29
+#define CFI_FP			CFI_R29
+#define CFI_BP			CFI_FP
+#define CFI_SP			31
+
+int arm_decode_add_sub(u32 instr, enum insn_type *type,
+		       unsigned long *immediate, struct list_head *ops_list)
+{
+	unsigned long imm12 = 0, imm = 0;
+	unsigned char sf = 0, sh = 0, S = 0, op_bit = 0;
+	unsigned char rn = 0, rd = 0;
+
+	S = EXTRACT_BIT(instr, 29);
+	op_bit = EXTRACT_BIT(instr, 30);
+	sf = EXTRACT_BIT(instr, 31);
+	sh = EXTRACT_BIT(instr, 22);
+	rd = instr & ONES(5);
+	rn = (instr >> 5) & ONES(5);
+	imm12 = (instr >> 10) & ONES(12);
+	// 妙，实现了32和64位的切换
+	imm = ZERO_EXTEND(imm12 << (sh * 12), (sf + 1) * 32);
+
+	*type = INSN_OTHER;
+
+    // 理解不能，为什么需要判断这个指令类型?
+	if (rd == CFI_BP || (!S && rd == CFI_SP) || stack_related_reg(rn)) {
+		struct stack_op *op;
+
+		*type = INSN_STACK;
+
+		op = calloc(1, sizeof(*op));
+		list_add_tail(&op->list, ops_list);
+
+		op->dest.type = OP_DEST_REG;
+		op->dest.offset = 0;
+		op->dest.reg = rd;
+		op->src.type = OP_SRC_ADD;
+		// 实现sub/add
+		op->src.offset = op_bit ? -1 * imm : imm;
+		op->src.reg = rn;
+	}
+	return 0;
+}
+```
+
+### Add/subtract (immediate, with tags)
+
+在函数 `arm_decode_add_sub_tags` 实现。
+
+### Logical (immediate)
+
+在函数 `arm_decode_logical` 实现。
