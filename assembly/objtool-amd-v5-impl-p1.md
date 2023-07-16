@@ -421,4 +421,115 @@ int arm_decode_add_sub(u32 instr, enum insn_type *type,
 
 ### Logical (immediate)
 
-在函数 `arm_decode_logical` 实现。
+```c
+
+// 获取最高位索引
+int highest_set_bit(u32 x)
+{
+	int i;
+
+	for (i = 31; i >= 0; i--, x <<= 1)
+	    // 0x80000000 32位二进制形式最高位为1
+	    // 10000000000000000000000000000000
+		if (x & 0x80000000)
+			return i;
+	return 0;
+}
+
+/* imms and immr are both 6 bit long */
+__uint128_t decode_bit_masks(unsigned char N, unsigned char imms,
+			     unsigned char immr, bool immediate)
+{
+	u64 tmask, wmask;
+	u32 diff, S, R, esize, welem, telem;
+	unsigned char levels = 0, len = 0;
+
+	// 计算imms中第一位为1的索引？
+	len = highest_set_bit((N << 6) | ((~imms) & ONES(6)));
+	levels = ZERO_EXTEND(ONES(len), 6);
+
+	if (immediate && ((imms & levels) == levels)) {
+		WARN("unknown instruction");
+		return -1;
+	}
+
+	S = imms & levels;
+	R = immr & levels;
+	diff = ZERO_EXTEND(S - R, 6);
+
+	esize = 1 << len;
+	diff = diff & ONES(len);
+
+	welem = ZERO_EXTEND(ONES(S + 1), esize);
+	telem = ZERO_EXTEND(ONES(diff + 1), esize);
+
+	wmask = replicate(ror(welem, esize, R), esize, 64 / esize);
+	tmask = replicate(telem, esize, 64 / esize);
+
+	return ((__uint128_t)wmask << 64) | tmask;
+}
+
+
+int arm_decode_logical(u32 instr, enum insn_type *type,
+		       unsigned long *immediate, struct list_head *ops_list)
+{
+	unsigned char sf = 0, opc = 0, N = 0;
+	unsigned char imms = 0, immr = 0, rn = 0, rd = 0;
+	struct stack_op *op;
+
+	rd = instr & ONES(5);
+	rn = (instr >> 5) & ONES(5);
+
+	imms = (instr >> 10) & ONES(6);
+	immr = (instr >> 16) & ONES(6);
+
+	N = EXTRACT_BIT(instr, 22);
+	opc = (instr >> 29) & ONES(2);
+	sf = EXTRACT_BIT(instr, 31);
+
+	if (N == 1 && sf == 0)
+		return arm_decode_unknown(instr, type, immediate, ops_list);
+
+	*type = INSN_OTHER;
+	*immediate = (decode_bit_masks(N, imms, immr, true) >> 64);
+
+	if (opc & 1)
+		return 0;
+
+	if (rd != CFI_SP)
+		return 0;
+
+	*type = INSN_STACK;
+
+	if (rn != CFI_SP) {
+		op = calloc(1, sizeof(*op));
+		list_add_tail(&op->list, ops_list);
+
+		op->dest.type = OP_DEST_REG;
+		op->dest.offset = 0;
+		op->dest.reg = rd;
+		op->src.type = OP_SRC_REG;
+		op->src.offset = 0;
+		op->src.reg = rn;
+	}
+
+	op = calloc(1, sizeof(*op));
+	list_add_tail(&op->list, ops_list);
+
+	op->dest.type = OP_DEST_REG;
+	op->dest.offset = 0;
+	op->dest.reg = rd;
+
+	op->src.type = OP_SRC_AND;
+	op->src.offset = 0;
+	op->src.reg = rd;
+
+	return 0;
+}
+```
+
+有两个函数：`decode_bit_masks` 和 `arm_decode_logical`，其中前者是在 `bit_operations.c` 文件中实现，后者调用了前者。
+
+`decode_bit_masks` 返回一个 bitmask immediate。其中对于 32 位返回`imms:immr`，64 位返回`N:imms:immr`。可以查看 Arm 的实现(https://developer.arm.com/documentation/ddi0596/2020-12/Shared-Pseudocode/AArch64-Instrs?lang=en#impl-aarch64.DecodeBitMasks.4).
+
+在函数 `arm_decode_logical.c` 中实现。
