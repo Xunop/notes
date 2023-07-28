@@ -1,4 +1,4 @@
 proxy/*
 linux/*
 asm-reg
-encoding-of-immediate-values-on-aarch64.md
+encoding-of-immediate-values-on-aarch64

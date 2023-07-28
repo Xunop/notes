@@ -139,3 +139,7 @@ Logical instructions 拥有 13 位立即数。这里的内容稍微复杂，请�
 - https://blog.csdn.net/pcj_888/article/details/121455966
 
 - https://dinfuehr.github.io/blog/encoding-of-immediate-values-on-aarch64/
+
+## Load/Store instructions
+
+查看 ARM manual C6.2.166.
