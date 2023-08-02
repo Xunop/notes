@@ -1,4 +1,4 @@
-# 使用 qemu-nbd 对虚拟机进行扩容
+# 使用 qemu-nbd 对虚拟机进行扩容[^1]
 
 ## 使用 qemu-img 扩容
 
@@ -59,3 +59,5 @@ sudo mount /dev/nbd0px /mnt
 > `nbd0px` 其中的 x 表示一个数字。
 
 之后跟挂载硬盘一样操作。
+
+[^1]: [参考文章 1](https://linuxconfig.org/how-to-resize-a-qcow2-disk-image-on-linux)
