@@ -61,6 +61,9 @@ struct instruction *find_insn(struct objtool_file *file,
 	list_for_each_entry(sec, &file->elf->sections, list)
 
 
+#define sec_for_each_sym(sec, sym)					\
+	list_for_each_entry(sym, &sec->symbol_list, list)
+
 /**
  * list_for_each_entry	-	iterate over list of given type
  * @pos:	the type * to use as a loop cursor.
@@ -71,4 +74,17 @@ struct instruction *find_insn(struct objtool_file *file,
 	for (pos = list_first_entry(head, typeof(*pos), member);	\
 	     !list_entry_is_head(pos, head, member);			\
 	     pos = list_next_entry(pos, member))
+```
+
+```c
+#define sec_for_each_insn(file, _sec, insn)				\
+	for (insn = find_insn(file, _sec, 0);				\
+	     insn && insn->sec == _sec;					\
+	     insn = next_insn_same_sec(file, insn))
+
+#define for_each_insn(file, insn)					\
+	for (struct section *__sec, *__fake = (struct section *)1;	\
+	     __fake; __fake = NULL)					\
+		for_each_sec(file, __sec)				\
+			sec_for_each_insn(file, __sec, insn)
 ```
