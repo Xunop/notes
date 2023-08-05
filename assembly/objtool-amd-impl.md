@@ -15,6 +15,21 @@ main -> objtool_run -> objtool_open_read -> check -> decode_sections
 			}
 ```
 
+> 解决，将`decode_instructions`函数中以下代码注释：
+>
+> ```c
+> 			struct symbol *obj_sym = find_object_containing(sec, offset);
+> 			if (obj_sym) {
+> 				/* This is data in the middle of text section, skip it */
+> 				next_offset = obj_sym->offset + obj_sym->len;
+> 				continue;
+> 			}
+> ```
+>
+> 原因：会有部分指令在这里跳过，导致后面的哈希表无法加入这些指令：
+>
+> `hash_add(file->insn_hash, &insn->hash, sec_offset_hash(sec, insn->offset));`
+
 ```c
 struct instruction *find_insn(struct objtool_file *file,
 			      struct section *sec, unsigned long offset)
@@ -88,3 +103,23 @@ struct instruction *find_insn(struct objtool_file *file,
 		for_each_sec(file, __sec)				\
 			sec_for_each_insn(file, __sec, insn)
 ```
+
+接下来要做的事：
+
+1. 解决 `unreachable instruction` 警告。
+
+2. 解决 `call without frame pointer save/setup` 警告。
+
+3. 解决 `unannotated intra-function call` 警告。
+
+## unreachable instruction
+
+将 patch 13 14 15 加入回合到 kernel 中。
+
+## call without frame pointer save/setup
+
+查看 patch
+
+## unannotated intra-function
+
+查看patch
