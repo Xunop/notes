@@ -118,8 +118,62 @@ struct instruction *find_insn(struct objtool_file *file,
 
 ## call without frame pointer save/setup
 
-查看 patch
+查看 patch。
+
+关键在于`has_valid_stack_frame(struct insn_state *state)`函数：
+
+```c
+#define CFI_CFA -2
+#define CFI_BP AARCH64_INSN_REG_FP // x29
+#define CFI_RA AARCH64_INSN_REG_LR // x30
+
+static bool check_reg_frame_pos(const struct cfi_reg *reg,
+				int expected_offset)
+{
+	return reg->base == CFI_CFA &&
+	       reg->offset == expected_offset;
+}
+
+static bool has_valid_stack_frame(struct insn_state *state)
+{
+	struct cfi_state *cfi = &state->cfi;
+
+	if (cfi->cfa.base == CFI_BP &&
+	    check_reg_frame_pos(&cfi->regs[CFI_BP], -cfi->cfa.offset) &&
+	    check_reg_frame_pos(&cfi->regs[CFI_RA], -cfi->cfa.offset + 8))
+		return true;
+
+	if (cfi->drap && cfi->regs[CFI_BP].base == CFI_BP)
+		return true;
+
+	return false;
+}
+```
+
+```c
+			if (opts.stackval && func && !is_fentry_call(insn) &&
+			    !has_valid_stack_frame(&state)) {
+				WARN_INSN(insn, "call without frame pointer save/setup");
+				return 1;
+			}
+```
+
+要使这个函数返回 true，必须满足以下条件：
+
+1. CFA 的基址是否为`CFI_BP`，并且检查帧指针（FP x29）和返回地址寄存器（LR x30）的基址和
+   偏移量是否符合预期。
+   > 是否符合预期的要求：
+   >
+   > - 帧指针 FP 应该位于 CFA 的负偏移量位置。
+   > - 返回地址寄存器 LR 应该与 CFA 的负偏移量+8 的位置。
+   >
+   >   此处就是正常的函数调用栈帧的变化，在其它笔记中有说明。
+2. 如果存在 drap（可能是某种标志位，暂时没查），并且帧指针的基址与 CFI_BP 相等，那么函数也会返回 true。
 
 ## unannotated intra-function
 
-查看patch
+查看 patch
+
+## drivers/irqchip/irq-gic-v3.o: warning: objtool: \_\_gic_get_ppi_index.part.0() is missing an ELF size annotation
+
+drivers/irqchip/irq-gic-v3.o: warning: objtool: gic_dist_base_alias.part.0() is missing an ELF size annotation
