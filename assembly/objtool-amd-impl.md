@@ -119,6 +119,7 @@ security/keys/gc.o: warning: objtool: key_gc_unused_keys.constprop.0+0x8c: unrea
 arch/arm64/kernel/debug-monitors.o: warning: objtool: user_enable_single_step+0x4: unreachable instruction
 ipc/util.o: warning: objtool: sysvipc_proc_open+0x50: unreachable instruction
 lib/bug.o: warning: objtool: report_bug+0x110: unreachable instruction
+arch/arm64/mm/dma-mapping.o: warning: objtool: arch_setup_dma_ops+0xbc: unreachable instruction
 ```
 
 主要问题在于`static int add_dead_ends(struct objtool_file *file)`函数，
@@ -145,8 +146,47 @@ lib/bug.o: warning: objtool: report_bug+0x110: unreachable instruction
 })
 ```
 
-但是目前还没排查到什么原因没有生效。
-我认为是这个宏的调用问题。
+但是目前还没排查到什么原因没有生效。补充：并不是没有生效，是生效了，但是仍然
+报警告。
+~~我认为是这个宏的调用问题。~~
+
+../ua/util.o: warning: objtool: sysvipc_proc_open+0x50: unreachable instruction
+
+经过 debug，发现是因为`validate_branch`函数中的这一段：
+
+```c
+		case INSN_JUMP_CONDITIONAL:
+		case INSN_JUMP_UNCONDITIONAL:
+			if (is_sibling_call(insn)) {
+				ret = validate_sibling_call(file, insn, &state);
+				if (ret)
+					return ret;
+
+			} else if (insn->jump_dest) {
+				ret = validate_branch(file, func,
+						      insn->jump_dest, state);
+				if (ret) {
+					if (opts.backtrace)
+						BT_FUNC("(branch)", insn);
+					return ret;
+				}
+			}
+
+			if (insn->type == INSN_JUMP_UNCONDITIONAL)
+				return 0;
+
+			break;
+```
+
+因为`sysvipc_proc_open+0x50`的上一个指令`sysvipc_proc_open+0x4c`是无条件跳转指令，
+所以导致直接`return 0`结束函数，导致后面的`0x50`无法继续解析。
+
+由 objdump`aarch64-linux-gnu-objdump -d ../ua/util.o`找出相对的指令如下：
+
+```
+     2ec:       14000024        b       37c <sysvipc_proc_open+0xdc>
+     2f0:       52800021        mov     w1, #0x1                        // #1
+```
 
 ## call without frame pointer save/setup
 
