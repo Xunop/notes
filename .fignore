@@ -1,3 +1,10 @@
+# If ignore dir, use the following format:
+# dir/*
+# If ignore file, use the following format:
+# dir/file.md
+# You also can use the filename without extension to ignore file:
+# arm-reg
+# note: just ignore arm-reg file, not ignore arm-reg/*
 proxy/*
-asm-reg
+arm-reg
 encoding-of-immediate-values-on-aarch64

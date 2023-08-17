@@ -2,26 +2,38 @@
 
 git checkout main
 files=$(git diff HEAD^ HEAD --name-only)
-echo "[INFO] new files: $(echo $files | awk '{print}')"
 
 #set -x
 # Determine .fileignore file if updated
 if [[ $(echo $files | grep .fignore) ]]; then
-        echo "[INFO] .fignore file updated"
+        echo ".fignore file updated"
         # Get the hash of the last two commit that modified .fignore
         latest_commit=$(git log -1 --pretty=format:%H)
         previous_commit=$(git log -2 --pretty=format:%H | tail -n 1)
         # If content has changed, check for specific changes
         diff_output=$(git diff $latest_commit_hash $previous_commit .fignore)
-        if echo "$diff_output" | grep -E "^-" >/dev/null; then
-                echo "File .fignore has deleted lines:"
-                echo "$diff_output" | grep "^-"
-                del_lines = $(echo "$diff_output" | grep "^-[^-]")
-
+        if echo "$diff_output" | grep -E "^-[^-]" >/dev/null; then
+                del_lines=$(echo "$diff_output" |
+                            grep "^-[^-]"       |
+                            sed '/^-/s/^-//'    |
+                            sed '/^#/d')
+                echo "File .fignore has deleted lines: $del_lines"
+                # Judge del_lines is file or dir
+                for line in $del_lines; do
+                        if [[ -f $line ]]; then
+                                echo "del file: $line"
+                                files+=($line)
+                        else
+                                u_files=$(find -name "$line.*")
+                        fi
+                        fi
+                done
         fi
 fi
+echo "files: ${files[@]}"
 #set +x
 
+echo "Updated files: ${files[@]}"
 # Read the .fignore file
 while read line; do
         # Ignore lines that start with "#" or are empty
