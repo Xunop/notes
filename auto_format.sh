@@ -20,17 +20,18 @@ if [[ $(echo $files | grep .fignore) ]]; then
                 echo "File .fignore has deleted lines: $del_lines"
                 # Judge del_lines is file or dir
                 for line in $del_lines; do
+                        # /dir/*
                         if [[ -f $line ]]; then
                                 echo "del file: $line"
                                 files+=($line)
+                        # filename
                         else
                                 u_files=$(find -name "$line.*")
-                        fi
+                                files+=($u_files)
                         fi
                 done
         fi
 fi
-echo "files: ${files[@]}"
 #set +x
 
 echo "Updated files: ${files[@]}"
