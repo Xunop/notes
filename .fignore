@@ -6,4 +6,5 @@
 # arm-reg
 # note: just ignore arm-reg file, not ignore arm-reg/*
 proxy/*
+linux/*
 # for test

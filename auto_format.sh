@@ -64,5 +64,5 @@ do
                 fi
         done
         echo "Formatting file: $file"
-        /bin/bash ../my_scripts/format.sh -f "$file"
+        #/bin/bash ../my_scripts/format.sh -f "$file"
 done
