@@ -6,4 +6,6 @@
 # arm-reg
 # note: just ignore arm-reg file, not ignore arm-reg/*
 proxy/*
-# for test
+linux/*
+arm-reg
+encoding-of-immediate-values-on-aarch64
