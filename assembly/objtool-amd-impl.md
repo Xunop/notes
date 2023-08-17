@@ -1,3 +1,5 @@
+# Objtool 迁移的一些记录
+
 objtool 执行顺序：
 
 ```
@@ -187,6 +189,12 @@ arch/arm64/mm/dma-mapping.o: warning: objtool: arch_setup_dma_ops+0xbc: unreacha
      2ec:       14000024        b       37c <sysvipc_proc_open+0xdc>
      2f0:       52800021        mov     w1, #0x1                        // #1
 ```
+
+好吧，又经过一段排查，发现这应该就是一个主要原因了。
+
+主要原因：aarch64 的无条件跳转指令 `b` 之后的指令如果
+在其它地方没有被跳转过来，那么这个指令的`visited`就为`0`，
+它将会报以上警告。
 
 ## call without frame pointer save/setup
 
