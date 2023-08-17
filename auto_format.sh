@@ -49,7 +49,7 @@ done < .fignore
 
 echo "ignore_list: ${ignore_list[@]}"
 #set -x
-for file in $files
+for file in "${files[@]}";
 do
         # Ignore files that match any pattern in the ignore list
         for pattern in "${ignore_list[@]}"; do
