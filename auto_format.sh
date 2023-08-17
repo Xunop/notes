@@ -34,7 +34,9 @@ if [[ $(echo $files | grep .fignore) ]]; then
 fi
 #set +x
 
-echo "Updated files: ${files[@]}"
+echo "Updated files: "
+echo "${files[@]}"
+echo "---------------------"
 # Read the .fignore file
 while read line; do
         # Ignore lines that start with "#" or are empty
