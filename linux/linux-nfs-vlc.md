@@ -3,7 +3,7 @@
 最近在 vlc 上将电脑的一些文件挂载到手机上，这样
 手机就可以看电脑上的番了。
 
-## nfs 设置[^1]
+## nfs 设置 [^1]
 
 前置条件：下载安装 `nfs-utils`
 
@@ -26,6 +26,7 @@ mount --bind /run/media/xun/E/Anime /srv/nfs/anime
 > `insecure`: 允许使用不安全的端口进行连接。如果不加这个参数，vlc 是无法正确显示文件的。[^2]
 > NFS 服务器和客户端之间的通信通常需要建立连接并交换数据。默认情况下，NFS 使用一些随机的高端口（通常在 1024
 > 以上）进行通信，这是为了增加安全性。这里需要使用 1024 以下的端口。
+> 参见[arch 手册](https://man.archlinux.org/man/exports.5)
 
 使配置生效：
 
@@ -34,6 +35,7 @@ exportfs -arv
 ```
 
 启动服务器：
+
 ```
 systemctl start nfs-server.service
 ```
@@ -42,7 +44,7 @@ systemctl start nfs-server.service
 
 电脑 suspend 之后似乎是会把 nfs 断掉的，这边断开不知道是网断还是哪里的原因，
 总之就是 suspend 之后会导致我无法连接我的电脑。但是平时又得把屏幕熄灭，
-所以需要设置一下电源设置[^3]：
+所以需要设置一下电源设置 [^3]：
 
 ```
 /etc/systemd/sleep.conf.d/disable-suspend.conf

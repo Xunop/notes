@@ -299,6 +299,10 @@ check -> validate_functions -> validate_section -> validate_symbol
    >   此处就是正常的函数调用栈帧的变化，在其它笔记中有说明。
 2. 如果存在 drap（可能是某种标志位，暂时没查），并且帧指针的基址与 CFI_BP 相等，那么函数也会返回 true。
 
+主要问题：
+
+没有成功计算出 `cfi->cfa.base` 的值，这个值应该要转换成 `CFI_BP` 的值。
+
 ## unannotated intra-function
 
 查看 patch
