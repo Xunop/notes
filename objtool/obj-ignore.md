@@ -66,6 +66,8 @@ arch/arm64/kernel/entry-fpsimd.o: warning: objtool: undecoded insn at .text:0x40
 free(): invalid pointer
 ```
 
+OBJECT_FILES_NON_STANDARD_entry-ftrace.o := y
+
 OBJECT_FILES_NON_STANDARD_sleep.o := y
 
 ```
@@ -101,6 +103,8 @@ arch/arm64/kvm/hyp/vhe/switch.o: warning: objtool: __get_fault_info+0x58: unreac
 ```
 
 OBJECT_FILES_NON_STANDARD_hyp-entry.o := y
+
+OBJECT_FILES_NON_STANDARD_vgic-v3-sr.o := y
 
 ## arch/arm64/mm/Makefile:
 
