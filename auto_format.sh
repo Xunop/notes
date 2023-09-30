@@ -123,6 +123,8 @@ do
 
         for f in $flush_dir/*; do
                 echo "Formatting file: $f"
-                /bin/bash ../my_scripts/format.sh -f "$f"
+                if [[ -f $f ]]; then
+                        /bin/bash ../my_scripts/format.sh -f "$f"
+                fi
         done
 done
