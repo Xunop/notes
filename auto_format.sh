@@ -70,6 +70,8 @@ for ifile in "${ignore_list[@]}"; do
         echo "ignore_list: $ifile"
 done
 
+sleep 1
+
 files=$(echo "${update_files[@]}" | tr '\n' ' ')
 
 IFS=' ' read -r -a files <<< "${files[@]}"
@@ -89,14 +91,14 @@ do
                 fi
         done
         echo "Formatting file: $file"
-        # /bin/bash ../my_scripts/format.sh -f "$file"
+        /bin/bash ../my_scripts/format.sh -f "$file"
 done
 
 # Itersate over all files in the repo
 for file in $(find . -type f -not -path '*/\.*' -not -path './.fignore' -not -path './.git/*' -name flush);
 do
         echo "---------FLUSH-----------"
-        filename=$(basename $file)
+        filename="${file#./}"
         echo "Flush file: $file"
 
         content=$(cat $file)
