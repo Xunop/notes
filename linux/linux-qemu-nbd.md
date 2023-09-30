@@ -1,6 +1,8 @@
-# 使用 qemu-nbd 对虚拟机进行扩容[^1]
+# 使用 qemu-nbd 对虚拟机进行扩容
 
 ## 使用 qemu-img 扩容
+
+使用 qemu-img 扩容[^1]
 
 ```sh
 qemu-img resize disk.qcow2 +10G
