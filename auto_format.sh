@@ -124,7 +124,7 @@ do
         for f in $flush_dir/*; do
                 echo "Formatting file: $f"
                 if [[ -f $f ]]; then
-                        /bin/bash ../my_scripts/format.sh -f "$f"
+                        /bin/bash ../my_scripts/format.sh -f "$f" --force
                 fi
         done
 done
