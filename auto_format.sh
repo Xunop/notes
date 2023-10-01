@@ -97,9 +97,10 @@ done
 # Itersate over all files in the repo
 for file in $(find . -type f -not -path '*/\.*' -not -path './.fignore' -not -path './.git/*' -name flush);
 do
+        echo "original file: $file"
         echo "---------FLUSH-----------"
         filename="${file#./}"
-        echo "Flush file: $file"
+        echo "Flush file: $filename"
 
         content=$(cat $file)
         if [[ $content != "flush" ]]; then
@@ -107,23 +108,25 @@ do
                 continue
         fi
 
-        flush_dir=$(dirname $file)
-        # Ignore files that match any pattern in the ignore list
-        for pattern in "${ignore_list[@]}"; do
-                if [[ $filename == $pattern ]]; then
-                        echo "Ignoring file: $file"
-                        continue 2
-                fi
-                name=$(basename $file)
-                if [[ $name == $pattern ]]; then
-                        echo "Ignoring file: $file"
-                        continue 2
-                fi
-        done
+        flush_dir=$(dirname $filename)
 
         for f in $flush_dir/*; do
+                # Ignore files that match any pattern in the ignore list
+                for pattern in "${ignore_list[@]}"; do
+                        if [[ "$f" == "$pattern" ]]; then
+                                echo "Ignoring file: $f"
+                                continue 2
+                        fi
+                        name=$(basename "$f")
+                        echo "name: $name"
+                        if [[ "$name" == "$pattern" ]]; then
+                                echo "Ignoring file: $f"
+                                continue 2
+                        fi
+                done
                 echo "Formatting file: $f"
                 if [[ -f $f ]]; then
+                        echo ''
                         /bin/bash ../my_scripts/format.sh -f "$f" --force
                 fi
         done
