@@ -6,5 +6,4 @@
 # arm-reg
 # note: just ignore arm-reg file, not ignore arm-reg/*
 proxy/*
-linux-aarch64-compile.md
 # for test
