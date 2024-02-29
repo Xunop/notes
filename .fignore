@@ -6,4 +6,7 @@
 # arm-reg
 # note: just ignore arm-reg file, not ignore arm-reg/*
 proxy/*
+security/yubikey-with-linux.md
+linux/fork-base.md
+qemu/qemu-trace.md
 # for test
