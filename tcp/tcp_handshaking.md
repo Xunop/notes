@@ -1,4 +1,4 @@
-# TCP 握手
+# TCP 握手与挥手
 
 最近在看某个项目的一个功能：[network-lock](https://www.criu.org/TCP_connection#Checkpoint_and_restore_TCP_connection), 感觉还挺有意思的，于是写了一个 TCP Demo 来测试这个功能，但是在我手动将 server 关闭的时候发现不能马上使用上次 server 监听的端口，而是跟我说端口已被占用，有些好奇，于是就有了以下的一些折腾。顺便在这里记录一下关于 TCP 三次握手与挥手的笔记。顺带 `tcpdump` 分析。
 
