@@ -7,3 +7,4 @@ linux-nfs-vlc.md: linux nfs vlc
 stack-unwinding.md: linux kernel objtool
 linux-emulate-aarch64.md: linux arm64 virtual-machine qemu
 linux-qemu-nbd.md: linux qemu
+linux-setting-the-default-microphone.md: linux alsa pipewire
