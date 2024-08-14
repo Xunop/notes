@@ -8,5 +8,6 @@
 proxy/*
 security/yubikey-with-linux.md
 linux/fork-base.md
+linux/linux-lvm.md
 qemu/qemu-trace.md
 # for test
