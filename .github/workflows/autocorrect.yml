@@ -1,0 +1,32 @@
+name: AutoCorrect Check
+
+on: [push, pull_request]
+
+jobs:
+  autocorrect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 获取本次修改的文件列表
+      - name: Get changed files
+        id: changed_files
+        run: |
+          git diff --name-only ${{ github.base_ref }} ${{ github.head_ref }} > changed_files.txt
+          echo "---DEBUG---"
+          cat changed_files.txt
+          echo "---DEBUG---"
+          echo "changed_files=$(cat changed_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
+
+      - name: AutoCorrect
+        uses: huacnlee/autocorrect-action@v2
+        with:
+          args: ${{ env.changed_files }}
+
+      - name: Report ReviewDog
+        if: failure()
+        uses: huacnlee/autocorrect-action@v2
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.PAT }}
+        with:
+          reviewdog: true
