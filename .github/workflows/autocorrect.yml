@@ -20,7 +20,7 @@ jobs:
       - name: AutoCorrect
         uses: huacnlee/autocorrect-action@v2
         with:
-          args: --lint --no-diff-bg-color --fix ${{ env.changed_files }}
+          args: --fix ${{ env.changed_files }}
 
       - name: For DEBUG
         run: |
