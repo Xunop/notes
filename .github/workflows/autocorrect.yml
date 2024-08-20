@@ -8,7 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 获取本次修改的文件列表
       - name: Get changed files
         id: changed_files
         run: |
@@ -23,10 +22,23 @@ jobs:
         with:
           args: ${{ env.changed_files }}
 
-      - name: Report ReviewDog
-        if: failure()
-        uses: huacnlee/autocorrect-action@v2
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.PAT }}
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
         with:
-          reviewdog: true
+          token: ${{ secrets.PAT }}
+          commit-message: Fix syntax errors detected in main branch
+          committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          author: AutoCorrect Bot <autocorrect-bot@noreply.github.com>
+          signoff: false
+          branch: autocorrect-fixes
+          delete-branch: true
+          title: 'AutoCorrect: Fix syntax errors detected in main branch'
+          body: |
+            This PR was automatically created by AutoCorrect to fix syntax errors detected in the main branch.
+            Please review the changes and merge if appropriate.
+          labels: |
+            syntax fix
+            automated pr
+          milestone: 1
+          draft: false
