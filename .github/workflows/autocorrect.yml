@@ -22,6 +22,11 @@ jobs:
         with:
           args: --lint --no-diff-bg-color --fix ${{ env.changed_files }}
 
+      - name: For DEBUG
+        run: |
+          git status
+          git diff
+
       - name: Create Pull Request
         id: cpr
         if: failure()
