@@ -11,7 +11,7 @@ jobs:
       - name: Get changed files
         id: changed_files
         run: |
-          git diff --diff-filter=AM --name-only ${{ github.base_ref }} ${{ github.head_ref }} > changed_files.txt
+          git diff --diff-filter=AM --name-only HEAD~1 HEAD > changed_files.txt
           echo "---DEBUG---"
           cat changed_files.txt
           echo "---DEBUG---"
@@ -27,7 +27,7 @@ jobs:
         if: failure()
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT }}
           commit-message: Fix syntax errors detected in main branch
           committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
           author: AutoCorrect Bot <autocorrect-bot@noreply.github.com>
