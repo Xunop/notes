@@ -14,10 +14,8 @@ jobs:
         id: changed_files
         run: |
           git diff --diff-filter=AM --name-only HEAD~1 HEAD > changed_files.txt
-          echo "---DEBUG---"
-          cat changed_files.txt
-          echo "---DEBUG---"
           echo "changed_files=$(cat changed_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
+          rm changed_files.txt
 
       - name: AutoCorrect
         uses: huacnlee/autocorrect-action@v2
@@ -43,5 +41,4 @@ jobs:
           labels: |
             syntax fix
             automated pr
-          milestone: 1
           draft: false
