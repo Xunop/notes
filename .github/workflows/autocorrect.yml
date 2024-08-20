@@ -22,14 +22,19 @@ jobs:
         with:
           args: --fix ${{ env.changed_files }}
 
-      - name: For DEBUG
+      - name: Check for AutoCorrect changes
+        id: check_autocorrect_changes
         run: |
-          git status
-          git diff
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "AutoCorrect made changes"
+            echo "autocorrect_changes=true" >> $GITHUB_ENV
+          else
+            echo "No changes detected"
+            echo "autocorrect_changes=false" >> $GITHUB_ENV
 
       - name: Create Pull Request
         id: cpr
-        if: failure()
+        if: env.autocorrect_changes == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.PAT }}
