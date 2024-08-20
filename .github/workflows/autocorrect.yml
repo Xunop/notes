@@ -32,7 +32,8 @@ jobs:
           committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
           author: AutoCorrect Bot <autocorrect-bot@noreply.github.com>
           signoff: false
-          branch: autocorrect-fixes
+          branch: autocorrect-fixes-$(date +%s)
+          base: main
           delete-branch: true
           title: 'AutoCorrect: Fix syntax errors detected in main branch'
           body: |
