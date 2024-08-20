@@ -1,6 +1,6 @@
 name: AutoCorrect Check
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   autocorrect:
