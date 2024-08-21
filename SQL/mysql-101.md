@@ -110,7 +110,7 @@ FROM table_name
 ORDER BY column1, column2, ... ASC|DESC;
 ```
 
-> ASC:Ascending （升序）, DESC: descending （降序）
+> ASC:Ascending（升序）, DESC: descending（降序）
 
 ## INSERT INTO
 
@@ -682,9 +682,9 @@ WHERE condition;
 
 ## CASE
 
-`CASE` 语句遍历条件并在满足第一个条件时返回一个值（如 if-then-else 语句）。 因此，一旦条件为真，它将停止读取并返回结果。 如果没有条件为真，则返回 `ELSE` 子句中的值。
+`CASE` 语句遍历条件并在满足第一个条件时返回一个值（如 if-then-else 语句）。因此，一旦条件为真，它将停止读取并返回结果。如果没有条件为真，则返回 `ELSE` 子句中的值。
 
-如果没有 `ELSE` 部分且没有条件为真，则返回NULL。
+如果没有 `ELSE` 部分且没有条件为真，则返回 NULL。
 
 语法：
 

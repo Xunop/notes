@@ -1,4 +1,4 @@
-sp 用于计算 PREV_RSP ， bp 用于计算 PREV_RBP ，PREV_RIP 计算 PREV_RSP。
+sp 用于计算 PREV_RSP，bp 用于计算 PREV_RBP，PREV_RIP 计算 PREV_RSP。
 
 查找与所疑问指令相对应的 ORC 记录。上述每一行对应一个 ORC 记录。每个记录都与一个指令偏移量相关联，并按排序顺序保存这些记录。一个记录从所列的指令偏移量开始有效，直到下一个记录出现。
 

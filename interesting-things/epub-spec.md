@@ -87,7 +87,7 @@ EPUB 格式是一种 zip 格式，大概由这些内容组成：
 </container>
 ```
 
-> 将包含 SVG 和 XHTML 的 《The Sandman》合并到同一个容器中
+> 将包含 SVG 和 XHTML 的《The Sandman》合并到同一个容器中
 
 ### Encryption – META-INF/encryption.xml
 
@@ -178,7 +178,7 @@ identifier 由数字图书的创建者定义，必须唯一。对于图书出版
 
 #### Spine
 
-所有 xhtml 文档的阅读顺序，可以将 OPF spine 理解为是书中 “页面” 的顺序，
+所有 xhtml 文档的阅读顺序，可以将 OPF spine 理解为是书中“页面”的顺序，
 解析的时候按照文档顺序从上到下依次读取 spine。
 
 在 spine 中的每个 itemref 元素都需要有一个 idref 属性，这个属性和 manifest 中的某个 ID 匹配。

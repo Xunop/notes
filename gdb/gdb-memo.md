@@ -1,6 +1,6 @@
 # gdb 常用操作记录
 
-因为写了一段时间内核中的 objtool ，出现一些问题时需要使用 gdb 进行调试。这里记录一下自己的常用操作。学习建议还是看 [gdb manual](https://sourceware.org/gdb/current/onlinedocs/gdb.html/)，这是一点点笔记，gdb 的使用那可真是太多了。
+因为写了一段时间内核中的 objtool，出现一些问题时需要使用 gdb 进行调试。这里记录一下自己的常用操作。学习建议还是看 [gdb manual](https://sourceware.org/gdb/current/onlinedocs/gdb.html/)，这是一点点笔记，gdb 的使用那可真是太多了。
 
 ## gdb 配置
 
@@ -42,7 +42,7 @@ b func
 
 ### 栈帧
 
-查看栈帧（ backtrace/bt ）：
+查看栈帧（backtrace/bt）：
 
 ```sh
 bt num

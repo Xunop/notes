@@ -38,13 +38,13 @@
 在 `main` 函数中，地址为 0x400563 的 `call` 指令调用函数 `multstore`。此时状态如第二个图中的 a。
 
 执行完之后，因为 `call` 指令的效果会将返回地址 A 压入栈中，并将 PC 设置成 Q 的起始地址。
-在这个例子中就是将 `main` 函数中的 `call` 指令后的 `mov` 指令的地址 0x400568 压入栈中，将 PC(%rip)设置成 `multstore` 的起始地址。
+在这个例子中就是将 `main` 函数中的 `call` 指令后的 `mov` 指令的地址 0x400568 压入栈中，将 PC(%rip) 设置成 `multstore` 的起始地址。
 
 函数`multstore`继续执行，直到遇到`ret` 指令。这条指令会从栈中弹出值 0x400568，然后跳转到这个地址，继续`main`函数的执行。
 
 ![cs-procedure-1](https://images-1310117338.cos.ap-nanjing.myqcloud.com/blog/cs-procedure-1.jpg)
 
-栈指针 %rsp，程序计数器(PC) %rip。程序计数器存储下一条执行的指令。
+栈指针 %rsp，程序计数器 (PC) %rip。程序计数器存储下一条执行的指令。
 
 ![cs-procedure-2](https://images-1310117338.cos.ap-nanjing.myqcloud.com/blog/cs-procedure-2.jpg)
 

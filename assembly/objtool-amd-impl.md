@@ -294,7 +294,7 @@ check -> validate_functions -> validate_section -> validate_symbol
    > 是否符合预期的要求：
    >
    > - 帧指针 FP 应该位于 CFA 的负偏移量位置。
-   > - 返回地址寄存器 LR 应该与 CFA 的负偏移量+8 的位置。
+   > - 返回地址寄存器 LR 应该与 CFA 的负偏移量 +8 的位置。
    >
    >   此处就是正常的函数调用栈帧的变化，在其它笔记中有说明。
 2. 如果存在 drap（可能是某种标志位，暂时没查），并且帧指针的基址与 CFI_BP 相等，那么函数也会返回 true。

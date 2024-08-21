@@ -6,7 +6,7 @@
 
 ## declare hashtable
 
-声明哈希表:
+声明哈希表：
 
 ```c
 #define DECLARE_HASHTABLE(name, bits)                                   	\

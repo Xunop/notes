@@ -62,7 +62,7 @@ int arm_decode_dp_imm(u32 instr, enum insn_type *type,
 +--------+-----------+---------+-----------------------------------------------------------------------------------------+
 ```
 
-当 28-26 位为 100 时，armv8 的指令格式如上。其中，op0 的数字的不同有不同的作用(C4.1.86):
+当 28-26 位为 100 时，armv8 的指令格式如上。其中，op0 的数字的不同有不同的作用 (C4.1.86):
 
 | Decode fields op0 | Decode group or instruction        |
 | ----------------- | ---------------------------------- |
@@ -74,7 +74,7 @@ int arm_decode_dp_imm(u32 instr, enum insn_type *type,
 | 110               | Bitfield                           |
 | 111               | Extract                            |
 
-详细情况查阅文档(c4.1.86)
+详细情况查阅文档 (c4.1.86)
 
 ```c
 #define INSN_DP_IMM_SUBCLASS(opcode)			\
@@ -127,21 +127,21 @@ static arm_decode_class aarch64_insn_dp_imm_decode_table[NR_DP_IMM_SUBCLASS] = {
 `tools/objtool/arch/arm64/include/bit_operations.h`中有这样一段宏定义，定义一些常见的位操作：
 
 ```c
-// 生成N位全为1的值
+// 生成 N 位全为 1 的值
 #define ONES(N)			(((__uint128_t)1 << (N)) - 1)
 // 零扩展：零扩展指的是将目标的高位数设置为零，而不是将高位数设置成原数字的最高有效位。
 // 零扩展通常用于将无符号数字移动至较大的字段中，同时保留其数值；
 // 而符号扩展通常用于有符号的数字。
 #define ZERO_EXTEND(X, N)	((X) & ONES(N))
-// 提取X中的第N位位数
+// 提取 X 中的第 N 位位数
 #define EXTRACT_BIT(X, N)	(((X) >> (N)) & ONES(1))
 // 符号扩展
 #define SIGN_EXTEND(X, N)	sign_extend((X), (N))
 
 // '~' 为取反
-// 0UL 表示把数字0转换为无符号长整型数
-// ~0UL 表示生成一个具有所有位都为1的掩码
-// nbits 表示x的最高位位置
+// 0UL 表示把数字 0 转换为无符号长整型数
+// ~0UL 表示生成一个具有所有位都为 1 的掩码
+// nbits 表示 x 的最高位位置
 static inline unsigned long sign_extend(unsigned long x, int nbits)
 {
 	return ((~0UL + (EXTRACT_BIT(x, nbits - 1) ^ 1)) << nbits) | x;
@@ -185,7 +185,7 @@ int arm_decode_pcrel(u32 instr, enum insn_type *type,
 	immlo = (instr >> 29) & ONES(2);
 
     // 符号扩展不理解为什么需要左移 2 | immlo
-    // 左移2对齐？
+    // 左移 2 对齐？
 	*immediate = SIGN_EXTEND((immhi << 2) | immlo, 21);
 
 	if (page)
@@ -202,7 +202,7 @@ int arm_decode_pcrel(u32 instr, enum insn_type *type,
 > - ADR 指令用于计算相对于程序计数器（PC）的地址偏移量，并将结果加载到目标寄存器中。`ADR ro, jump_target`
 > - ADRP 则是用于计算相对于**页表**的地址偏移量，并将结果加载到目标寄存器。`ADRP x0, page_table_entry`. ADRP 在计算出的地址偏移量的高 12 位上会填充一些数据（待查找，似乎是相应的页表索引）
 
-### 处理 Move wide (immediate)的情况
+### 处理 Move wide (immediate) 的情况
 
 布局：
 
@@ -234,7 +234,7 @@ int arm_decode_move_wide(u32 instr, enum insn_type *type,
 			 unsigned long *immediate, struct list_head *ops_list)
 {
 	u32 imm16 = 0;
-	// sf 就是首位标志位op
+	// sf 就是首位标志位 op
 	unsigned char hw = 0, opc = 0, sf = 0;
 
 	sf = EXTRACT_BIT(instr, 31);
@@ -242,7 +242,7 @@ int arm_decode_move_wide(u32 instr, enum insn_type *type,
 	hw = (instr >> 21) & ONES(2);
 	imm16 = (instr >> 5) & ONES(16);
 
-    // 这里(hw & 0x2)是将32bit的操作剔除？
+    // 这里 (hw & 0x2) 是将 32bit 的操作剔除？
 	if ((sf == 0 && (hw & 0x2)) || opc == 0x1)
 		return arm_decode_unknown(instr, type, immediate, ops_list);
 
@@ -349,12 +349,12 @@ int arm_decode_extract(u32 instr, enum insn_type *type,
 	o0 = EXTRACT_BIT(instr, 21);
 	imms = (instr >> 10) & ONES(6);
 
-	// decode_field 的作用刚好可以排除Unallocated的情况
+	// decode_field 的作用刚好可以排除 Unallocated 的情况
 	decode_field = (sf << 4) | (op21 << 2) | (N << 1) | o0;
 	*type = INSN_OTHER;
 	*immediate = imms;
 
-    // 10010 是EXTR-64-bit，0则是EXTR-32-bit
+    // 10010 是 EXTR-64-bit，0 则是 EXTR-32-bit
 	if ((decode_field == 0 && !EXTRACT_BIT(imms, 5)) ||
 	    decode_field == 0b10010)
 		return 0;
@@ -391,12 +391,12 @@ int arm_decode_add_sub(u32 instr, enum insn_type *type,
 	rd = instr & ONES(5);
 	rn = (instr >> 5) & ONES(5);
 	imm12 = (instr >> 10) & ONES(12);
-	// 妙，实现了32和64位的切换
+	// 妙，实现了 32 和 64 位的切换
 	imm = ZERO_EXTEND(imm12 << (sh * 12), (sf + 1) * 32);
 
 	*type = INSN_OTHER;
 
-    // 理解不能，为什么需要判断这个指令类型?
+    // 理解不能，为什么需要判断这个指令类型？
 	if (rd == CFI_BP || (!S && rd == CFI_SP) || stack_related_reg(rn)) {
 		struct stack_op *op;
 
@@ -409,7 +409,7 @@ int arm_decode_add_sub(u32 instr, enum insn_type *type,
 		op->dest.offset = 0;
 		op->dest.reg = rd;
 		op->src.type = OP_SRC_ADD;
-		// 实现sub/add
+		// 实现 sub/add
 		op->src.offset = op_bit ? -1 * imm : imm;
 		op->src.reg = rn;
 	}
@@ -431,7 +431,7 @@ int highest_set_bit(u32 x)
 	int i;
 
 	for (i = 31; i >= 0; i--, x <<= 1)
-	    // 0x80000000 32位二进制形式最高位为1
+	    // 0x80000000 32 位二进制形式最高位为 1
 	    // 10000000000000000000000000000000
 		if (x & 0x80000000)
 			return i;
@@ -446,7 +446,7 @@ __uint128_t decode_bit_masks(unsigned char N, unsigned char imms,
 	u32 diff, S, R, esize, welem, telem;
 	unsigned char levels = 0, len = 0;
 
-	// 计算imms中第一位为1的索引？
+	// 计算 imms 中第一位为 1 的索引？
 	len = highest_set_bit((N << 6) | ((~imms) & ONES(6)));
 	levels = ZERO_EXTEND(ONES(len), 6);
 
@@ -532,6 +532,6 @@ int arm_decode_logical(u32 instr, enum insn_type *type,
 
 有两个函数：`decode_bit_masks` 和 `arm_decode_logical`，其中前者是在 `bit_operations.c` 文件中实现，后者调用了前者。
 
-`decode_bit_masks` 返回一个 bitmask immediate。其中对于 32 位返回`imms:immr`，64 位返回`N:imms:immr`。可以查看 Arm 的实现(https://developer.arm.com/documentation/ddi0596/2020-12/Shared-Pseudocode/AArch64-Instrs?lang=en#impl-aarch64.DecodeBitMasks.4).
+`decode_bit_masks` 返回一个 bitmask immediate。其中对于 32 位返回`imms:immr`，64 位返回`N:imms:immr`。可以查看 Arm 的实现 (https://developer.arm.com/documentation/ddi0596/2020-12/Shared-Pseudocode/AArch64-Instrs?lang=en#impl-aarch64.DecodeBitMasks.4).
 
 在函数 `arm_decode_logical.c` 中实现。

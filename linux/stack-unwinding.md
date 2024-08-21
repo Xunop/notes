@@ -14,8 +14,8 @@ Stack unwinding 可以获取 stack trace, 用于 debugger 等一些操作。
 ### Frame Pointer Unwinds
 
 这是最简单、最经典的 stack unwinding：固定一个寄存器在 frame pointer(在 x86-64 上为 RBP)，
-函数把在汇编代码的 prologue 处把 frame pointer 放入栈帧中，并更新 frame pointer 为保存的 frame pointer 的地址。 frame pointer 值和栈上保存的值形成了一个单链表。
-获取初始 frame pointer 值(builtin_frame_address)后，不停解引用 frame pointer 即可得到所有栈帧的 frame pointer 值。
+函数把在汇编代码的 prologue 处把 frame pointer 放入栈帧中，并更新 frame pointer 为保存的 frame pointer 的地址。frame pointer 值和栈上保存的值形成了一个单链表。
+获取初始 frame pointer 值 (builtin_frame_address) 后，不停解引用 frame pointer 即可得到所有栈帧的 frame pointer 值。
 
 例子[^1]：
 
@@ -39,7 +39,7 @@ int main() { foo(); }
 通过这个代码的汇编我们可以清晰的看见 stack unwinding 的处理流程。
 代码太长，放到 github 仓库中，在一些地方写了注释：[cs.s](https://github.com/Xunop/notes/blob/main/linux/stack_unwinding/cs.s)
 
-这是一种软件的抽象：过程(procedures)，我在这篇博客中有记录：[过程](https://blog.fooo.in/2023/06/23/CS/cs-procedure)
+这是一种软件的抽象：过程 (procedures)，我在这篇博客中有记录：[过程](https://blog.fooo.in/2023/06/23/CS/cs-procedure)
 
 ### DWARF
 
@@ -86,8 +86,8 @@ main:
 此时 `%rsp` 的值是调用栈帧的处的栈指针的值，也就是 CFA。
 
 > 我们需要了解两个定义：CFI 和 CFA。
-> CFI: Call Frame Information (CFI)， 一种用于描述栈帧信息的调试信息。
-> CFA: Canonical Frame Address， 栈帧的规范地址。它是一个在调试过程中用于引用当前函数的栈帧的地址，CFA 可以通过 CFI 指令进行计算。
+> CFI: Call Frame Information (CFI)，一种用于描述栈帧信息的调试信息。
+> CFA: Canonical Frame Address，栈帧的规范地址。它是一个在调试过程中用于引用当前函数的栈帧的地址，CFA 可以通过 CFI 指令进行计算。
 
 当 `call` 指令被执行之后，将会压入 8 个字节的返回地址到栈中：
 
@@ -128,7 +128,7 @@ objtool 利用 ORC 生成的元数据来展开堆栈，比使用基于帧指针�
 
 同时 ORC 的调试信息比 DWARF 更简单："It gets rid of the complex DWARF CFI state machine and also gets rid of the tracking of unnecessary registers. "[^3]
 
-ORC 数据由 objtool 生成，其中包含由 unwind tables 组成的数据。这些 unwind tables 是通过进行编译时的**堆栈元数据验证**（CONFIG_STACK_VALIDATION）(stack metadata validation)生成的。在分析.o 文件的所有代码路径之后，objtool 确定了文件中每个指令地址的堆栈状态信息，并将该信息输出到.o 文件的.orc_unwind 和.orc_unwind_ip 节中。
+ORC 数据由 objtool 生成，其中包含由 unwind tables 组成的数据。这些 unwind tables 是通过进行编译时的**堆栈元数据验证**（CONFIG_STACK_VALIDATION）(stack metadata validation) 生成的。在分析.o 文件的所有代码路径之后，objtool 确定了文件中每个指令地址的堆栈状态信息，并将该信息输出到.o 文件的.orc_unwind 和.orc_unwind_ip 节中。
 
 以下的 orc.o 文件由上方 cs.c 文件生成。生成堆栈状态信息：
 

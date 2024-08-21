@@ -2,7 +2,7 @@
 
 以下内容参考自：[rfc6749](https://datatracker.ietf.org/doc/html/rfc6749)
 
-OAuth 在客户端和资源提供商之间引入了一个授权层(authorization layer)将客户端的角色和资源的角色分开。
+OAuth 在客户端和资源提供商之间引入了一个授权层 (authorization layer) 将客户端的角色和资源的角色分开。
 
 想象一个场景：
 
@@ -24,23 +24,23 @@ OAuth 在客户端和资源提供商之间引入了一个授权层(authorization
 
 在上述 OAuth 流程中出现了以下四种角色：
 
-### 资源所有者(resource owner)
+### 资源所有者 (resource owner)
 
-资源所有者是指能够对受保护资源授予访问权的实体。当资源拥有者是一个人时，则其表示要打印照片的我们(end-user)。
+资源所有者是指能够对受保护资源授予访问权的实体。当资源拥有者是一个人时，则其表示要打印照片的我们 (end-user)。
 
 在本文中，我有时会用用户代替资源所有者。
 
-### 资源服务器(resource server)
+### 资源服务器 (resource server)
 
-托管受保护资源的服务器，拥有接手并且响应一个带有访问令牌(access tokens)请求受保护资源的能力。
+托管受保护资源的服务器，拥有接手并且响应一个带有访问令牌 (access tokens) 请求受保护资源的能力。
 
-### 客户端(client)
+### 客户端 (client)
 
 一个被资源所有者授权的发出请求受保护资源的程序。也就是第三方服务，一个发出请求受保护资源的服务。
 
-### 授权服务器(authorization server)
+### 授权服务器 (authorization server)
 
-资源所有者在成功认证客户端之后由认证服务器来给予客户端访问令牌(access tokens)。客户端使用这个访问令牌去访问资源服务器。
+资源所有者在成功认证客户端之后由认证服务器来给予客户端访问令牌 (access tokens)。客户端使用这个访问令牌去访问资源服务器。
 
 记住这四个角色，后面的流程都与它们相关。
 
@@ -149,12 +149,12 @@ B. 认证服务器对用户进行身份验证（通过 user-agent）并确定用
 
 C. 假设用户给予授权，则认证服务器将用户重定向回客户端，同时附带上一个授权码（Authorization Code）,其中这个重定向 URI 来自客户端在 A 步骤发送得来。
 
-D. 客户端收到授权码，附上去获取授权码的重定向 URI，向认证服务器申请令牌。需要注意，这一步是在客户端的后台服务器上完成，对用户不可见。这也就是需要使用授权码换取access token 的原因，保证安全性。
+D. 客户端收到授权码，附上去获取授权码的重定向 URI，向认证服务器申请令牌。需要注意，这一步是在客户端的后台服务器上完成，对用户不可见。这也就是需要使用授权码换取 access token 的原因，保证安全性。
 
-E. 认证服务器核对了授权码和重定向 URI，确认无误后，向客户端发送访问令牌（access token） 或者更新令牌（refresh token）。
+E. 认证服务器核对了授权码和重定向 URI，确认无误后，向客户端发送访问令牌（access token）或者更新令牌（refresh token）。
 
-其他三种模式，请参考阮一峰老师的文章：[理解OAuth2.0](https://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html)
+其他三种模式，请参考阮一峰老师的文章：[理解 OAuth2.0](https://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html)
 
 ## RefreshToken
 
-关于RefreshToken这边依旧有很多讨论，在OAuth2这边是使用了RefreshToken这个技术，但是如果是平时的登录操作是否也需要使用RefreshToken这是个问题。查阅了一些信息：https://stackoverflow.com/questions/38986005/what-is-the-purpose-of-a-refresh-token, https://stackoverflow.com/questions/3487991/why-does-oauth-v2-have-both-access-and-refresh-tokens/12885823#12885823
+关于 RefreshToken 这边依旧有很多讨论，在 OAuth2 这边是使用了 RefreshToken 这个技术，但是如果是平时的登录操作是否也需要使用 RefreshToken 这是个问题。查阅了一些信息：https://stackoverflow.com/questions/38986005/what-is-the-purpose-of-a-refresh-token, https://stackoverflow.com/questions/3487991/why-does-oauth-v2-have-both-access-and-refresh-tokens/12885823#12885823

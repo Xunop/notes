@@ -27,7 +27,7 @@ PS: 墨水屏设备是「汉王 n10」
 - [FeedMe](https://github.com/seazon/FeedMe): 这个阅读软件没有公布源码。其实只在网页上阅读已经完全够了。这个软件可有可无。
 - [memos](https://github.com/usememos/memos): 一个开源、轻量级笔记服务。我用来记录自己的一些碎碎念。
 - [plain-app](https://github.com/ismartcoding/plain-app): 是一个开源应用程序，允许通过网络浏览器管理您的手机。使用安全、易于使用的 Web 界面从桌面访问文件、视频、音乐、联系人、短信、通话等，我用来传输文件。
-- [legado](https://github.com/gedoor/legado): 阅读3.0, 阅读是一款可以自定义来源阅读网络内容的工具，为广大网络文学爱好者提供一种方便、快捷舒适的试读体验。
+- [legado](https://github.com/gedoor/legado): 阅读 3.0, 阅读是一款可以自定义来源阅读网络内容的工具，为广大网络文学爱好者提供一种方便、快捷舒适的试读体验。
 
 解决我在阅读时候的“痛点”，需要在以下方面改善：
 

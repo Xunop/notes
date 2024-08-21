@@ -24,5 +24,5 @@ date: xxxx-xx-xx
 因为我的博客中有多个 `submodule` 分别是 `hexo-format` 这个脚本仓库和 `notes` 这个仓库。
 `notes` 我额外创仓库是方便管理我自己的笔记，然后可以使用 `hexo-format` 对 `notes` 中的笔记进行处理发表为博客的文章。
 
-`notes` 在主分支上提交之后就会触发一个 `web hook` 这个会触发 `blog` 仓库的action，
-在 `blog` 的action中会有一系列操作执行脚本，将 `notes` 新增的文章或者修改的文章进行处理之后提交 commit。
+`notes` 在主分支上提交之后就会触发一个 `web hook` 这个会触发 `blog` 仓库的 action，
+在 `blog` 的 action 中会有一系列操作执行脚本，将 `notes` 新增的文章或者修改的文章进行处理之后提交 commit。

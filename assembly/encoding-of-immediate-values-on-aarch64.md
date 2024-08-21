@@ -1,6 +1,6 @@
 # AARCH64 立即数范围
 
-在`tools/arch/arm64/include/asm/insn.h`中存在一个立即数的枚举类，用以分析 aarch64 中的立即数的类型:
+在`tools/arch/arm64/include/asm/insn.h`中存在一个立即数的枚举类，用以分析 aarch64 中的立即数的类型：
 
 ```c
 enum aarch64_insn_imm_type {
@@ -87,7 +87,7 @@ add/sub 指令的布局：
 +---+--+--+---------------------+--+--------------------------------+--------------+------------+
 ```
 
-如上图所示 `add/sub` 拥有 12 位无符号立即数(imm12)，可以通过设置 `sh` 将其移位 12 位（左移）。
+如上图所示 `add/sub` 拥有 12 位无符号立即数 (imm12)，可以通过设置 `sh` 将其移位 12 位（左移）。
 
 ## Move instructions
 
@@ -100,7 +100,7 @@ add/sub 指令的布局：
 +---+-----+-------------------+-----+-------------------+-----------------+
 ```
 
-move 指令(`movz`,`movn`,`movk`) 拥有 16 位立即数(imm16) 可以通过改变 hw 的值进行 0，16，32
+move 指令 (`movz`,`movn`,`movk`) 拥有 16 位立即数 (imm16) 可以通过改变 hw 的值进行 0，16，32
 或者 48 的移位。
 
 引用[这篇文章](https://dinfuehr.github.io/blog/encoding-of-immediate-values-on-aarch64/)中对 movz 和 movk 的解释及示例：
@@ -130,7 +130,7 @@ move 指令(`movz`,`movn`,`movk`) 拥有 16 位立即数(imm16) 可以通过改�
 +---+-----+---------------+-----------------------------+-----------------+
 ```
 
-adr,adrp 拥有 21 位立即数(immhi + immlo)
+adr,adrp 拥有 21 位立即数 (immhi + immlo)
 
 ## Logical instructions
 

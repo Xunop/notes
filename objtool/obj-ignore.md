@@ -8,7 +8,7 @@ warning:
 arch/arm64/net/bpf_jit_comp.o: warning: objtool: dummy_tramp() falls through to next function jit_fill_hole()
 ```
 
-> 这个报错是函数调用了一个不会返回的函数(noreturn)，只需要在 `check.c` 中的 `global_noreturns`
+> 这个报错是函数调用了一个不会返回的函数 (noreturn)，只需要在 `check.c` 中的 `global_noreturns`
 > 数组中添加这个不会返回的函数即可，但是这个地方是汇编。
 
 ## arch/arm64/kernel/Makefile:
