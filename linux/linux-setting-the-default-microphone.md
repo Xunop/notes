@@ -1,4 +1,4 @@
-# Linux 设置默认麦克风
+# Linux 设置默认麦克风以及音频输出
 
 最近在想办法医治我的拖延症，于是从各种出现的小问题开始解决。因为我其中一台笔记本在飞书开会的时候经常会出现默认麦克风无法使用的情况，经常需要调整，不说很大的问题，但是也是一个小问题。
 
@@ -63,6 +63,26 @@ pactl info | grep "Default Source"
 ```
 
 好，现在飞书会议麦克风设置成系统默认也可以正常工作了。
+
+音频输出方面是因为笔记本每次插上 HDMI 之后都会错误都会错误切换到HDMI那边，然而显示器并没有这个功能。
+
+同样列出可用的输出设备（Sinks）：
+
+```bash
+pactl list sinks
+```
+
+或者：
+
+```bash
+pactl list sinks
+```
+
+找到能出声的输出设备，把它设置成默认输出设备：
+
+```bash
+pactl set-default-sink alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__Speaker__sink
+```
 
 参考：
 
