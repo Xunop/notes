@@ -109,7 +109,7 @@ export const createEntity<T extends ...> = (data: ...) => { ... };
 
 **方式三：对象方法 + 泛型**
 
-泛型语法: 泛型 `<T>` 放在方法名之后，参数列表之前。
+泛型语法：泛型 `<T>` 放在方法名之后，参数列表之前。
 
 ```TypeScript
 
